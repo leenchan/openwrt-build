@@ -195,8 +195,8 @@ jobs:
           echo "CACHE_DL_ID: $CACHE_DL_ID"
           if echo "$CACHE_DL_ID" | grep -Eq '^[0-9]+$'; then  
             gh cache delete $CACHE_DL_ID || true
-            echo "toSaveDl=true" >> $GITHUB_OUTPUT
           fi
+          echo "toSaveDl=true" >> $GITHUB_OUTPUT
         }
 
     - name: Cache > save dl
