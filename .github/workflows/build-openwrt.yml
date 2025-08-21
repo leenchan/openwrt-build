@@ -32,6 +32,7 @@ env:
   HASH_TOOLCHAIN: ''
   HASH_TARGET: ''
   BUILD_DATE: ''
+  SOURCE_TYPE: ''
   UPLOAD_PACKAGES: true
   UPLOAD_RELEASE: true
 
@@ -43,15 +44,17 @@ jobs:
     - name: Set target device
       run: |
         if [ ${{ github.event.inputs.target }} = 'mt7981' ]; then
+          SOURCE_TYPE="immortalwrt"
           REPO_URL="https://github.com/padavanonly/immortalwrt-mt798x-6.6.git"
           REPO_BRANCH="openwrt-24.10-6.6"
           TARGET_NAME="mt7981"
-          RELEASE_PREFIX=immortalwrt-24.10-6.6-237
+          RELEASE_PREFIX="${SOURCE_TYPE}-24.10-6.6-237"
         elif [ ${{ github.event.inputs.target }} = 'x86_64' ]; then
+          SOURCE_TYPE="openwrt"
           REPO_URL="https://github.com/openwrt/openwrt.git"
           REPO_BRANCH="main"
           TARGET_NAME="x86_64"
-          RELEASE_PREFIX=openwrt-snapshot
+          RELEASE_PREFIX="${SOURCE_TYPE}-snapshot"
         fi
         LAST_COMMIT_HASH=$(curl -skL "$REPO_URL" | grep -Eo 'href="[^"]+/commit/[^"]+"' | head -n1 | grep -Eo '/commit/.{7}' | awk -F'/' '{print $NF}')
         [ -z "$LAST_COMMIT_HASH" ] || RELEASE_PREFIX="$RELEASE_PREFIX-$LAST_COMMIT_HASH"
@@ -62,6 +65,7 @@ jobs:
           echo "Error: TARGET_NAME is not set"
           exit 1
         }
+        echo "SOURCE_TYPE=$SOURCE_TYPE" >> $GITHUB_ENV
         echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
         echo "REPO_BRANCH=$REPO_BRANCH" >> $GITHUB_ENV
         echo "TARGET_NAME=$TARGET_NAME" >> $GITHUB_ENV
@@ -148,7 +152,7 @@ jobs:
       with:
         path: |
           ${{ env.OPENWRT_ROOT_DIR }}/dl/*.*
-        key: openwrt-${{ env.TARGET_NAME }}-dl
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-dl
 
     - name: Prepare for compiling
       run: |
@@ -190,8 +194,8 @@ jobs:
         find dl -type f -atime +30 -delete
         HASH_DL=$(find dl/**.* -exec sha256sum {} ';' | sha256sum | awk '{print $1}')
         [ "$HASH_DL" = "$HASH_DL_CACHE" ] || {
-          gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("openwrt-${{ env.TARGET_NAME }}-dl"))'
-          CACHE_DL_ID=$(gh cache list --json id --key openwrt-${{ env.TARGET_NAME }}-dl | jq '.[0].id')
+          gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-dl"))'
+          CACHE_DL_ID=$(gh cache list --json id --key ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-dl | jq '.[0].id')
           echo "CACHE_DL_ID: $CACHE_DL_ID"
           if echo "$CACHE_DL_ID" | grep -Eq '^[0-9]+$'; then  
             gh cache delete $CACHE_DL_ID || true
@@ -205,7 +209,7 @@ jobs:
       with:
         path: |
           ${{ env.OPENWRT_ROOT_DIR }}/dl/*.*
-        key: openwrt-${{ env.TARGET_NAME }}-dl
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-dl
 
     - name: Compile toolchain
       id: compile-toolchain
