@@ -46,15 +46,15 @@ jobs:
           REPO_URL="https://github.com/padavanonly/immortalwrt-mt798x-6.6.git"
           REPO_BRANCH="openwrt-24.10-6.6"
           TARGET_NAME="mt7981"
-          RELEASE_SUFFIX=immortalwrt-24.10-6.6-237
+          RELEASE_PREFIX=immortalwrt-24.10-6.6-237
         elif [ ${{ github.event.inputs.target }} = 'x86_64' ]; then
           REPO_URL="https://github.com/openwrt/openwrt.git"
           REPO_BRANCH="main"
           TARGET_NAME="x86_64"
-          RELEASE_SUFFIX=openwrt-snapshot
+          RELEASE_PREFIX=openwrt-snapshot
         fi
         LAST_COMMIT_HASH=$(curl -skL "$REPO_URL" | grep -Eo 'href="[^"]+/commit/[^"]+"' | head -n1 | grep -Eo '/commit/.{7}' | awk -F'/' '{print $NF}')
-        [ -z "$LAST_COMMIT_HASH" ] || RELEASE_SUFFIX="$RELEASE_SUFFIX-$LAST_COMMIT_HASH"
+        [ -z "$LAST_COMMIT_HASH" ] || RELEASE_PREFIX="$RELEASE_PREFIX-$LAST_COMMIT_HASH"
         
         echo "UPLOAD_RELEASE=$([ ${{ github.event.inputs.upload_release }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
         echo "UPLOAD_PACKAGES=$([ ${{ github.event.inputs.upload_packages }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
@@ -65,7 +65,7 @@ jobs:
         echo "REPO_URL=$REPO_URL" >> $GITHUB_ENV
         echo "REPO_BRANCH=$REPO_BRANCH" >> $GITHUB_ENV
         echo "TARGET_NAME=$TARGET_NAME" >> $GITHUB_ENV
-        echo "RELEASE_SUFFIX=$RELEASE_SUFFIX" >> $GITHUB_ENV
+        echo "RELEASE_PREFIX=$RELEASE_PREFIX" >> $GITHUB_ENV
         echo "UPLOAD_RELEASE=$([ ${{ github.event.inputs.upload_release }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
         echo "UPLOAD_PACKAGES=$([ ${{ github.event.inputs.upload_packages }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
       continue-on-error: false
@@ -281,7 +281,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=$(date +"%Y.%m.%d-%H%M-$RELEASE_SUFFIX")" >> $GITHUB_OUTPUT
+        echo "release_tag=${RELEASE_PREFIX}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
         echo "Source: $REPO_URL" >> release.txt
         echo "Branch: $REPO_BRANCH" >> release.txt
