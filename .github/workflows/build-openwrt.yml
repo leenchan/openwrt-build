@@ -48,7 +48,7 @@ jobs:
           REPO_URL="https://github.com/padavanonly/immortalwrt-mt798x-6.6.git"
           REPO_BRANCH="openwrt-24.10-6.6"
           TARGET_NAME="mt7981"
-          RELEASE_PREFIX="${SOURCE_TYPE}-24.10-6.6-237"
+          RELEASE_PREFIX="${SOURCE_TYPE}-24.10"
         elif [ ${{ github.event.inputs.target }} = 'x86_64' ]; then
           SOURCE_TYPE="openwrt"
           REPO_URL="https://github.com/openwrt/openwrt.git"
@@ -285,7 +285,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=${RELEASE_PREFIX}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        echo "release_tag=${RELEASE_PREFIX}-${TARGET_NAME}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
         echo "Source: $REPO_URL" >> release.txt
         echo "Branch: $REPO_BRANCH" >> release.txt
