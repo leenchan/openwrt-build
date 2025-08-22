@@ -56,9 +56,6 @@ jobs:
           TARGET_NAME="x86_64"
           RELEASE_PREFIX="${SOURCE_TYPE}-snapshot"
         fi
-        LAST_COMMIT_HASH=$(curl -skL "$REPO_URL" | grep -Eo 'href="[^"]+/commit/[^"]+"' | head -n1 | grep -Eo '/commit/.{7}' | awk -F'/' '{print $NF}')
-        [ -z "$LAST_COMMIT_HASH" ] || RELEASE_PREFIX="$RELEASE_PREFIX-$LAST_COMMIT_HASH"
-        
         echo "UPLOAD_RELEASE=$([ ${{ github.event.inputs.upload_release }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
         echo "UPLOAD_PACKAGES=$([ ${{ github.event.inputs.upload_packages }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
         [ -z "$TARGET_NAME" ] && {
@@ -97,6 +94,8 @@ jobs:
         sudo chown $USER:$GROUPS $OPENWRT_ROOT_DIR
         git clone $REPO_URL -b $REPO_BRANCH $OPENWRT_ROOT_DIR
         ln -sf /workdir/openwrt $GITHUB_WORKSPACE/openwrt
+        cd $OPENWRT_ROOT_DIR
+        echo "REPO_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Load custom feeds
       run: |
@@ -285,7 +284,7 @@ jobs:
       id: tag
       if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
-        echo "release_tag=${RELEASE_PREFIX}-${TARGET_NAME}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
+        echo "release_tag=${RELEASE_PREFIX}-${REPO_COMMIT_HASH}-${TARGET_NAME}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
         echo "Source: $REPO_URL" >> release.txt
         echo "Branch: $REPO_BRANCH" >> release.txt
