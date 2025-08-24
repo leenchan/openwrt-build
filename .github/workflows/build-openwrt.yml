@@ -22,6 +22,11 @@ on:
         type: boolean
         required: true
         default: true
+      ttyd_config:
+        description: 'Let me to generate .config manually'
+        type: boolean
+        required: false
+        default: false
       
 env:
   OPENWRT_ROOT_DIR: /mnt/openwrt
@@ -178,6 +183,20 @@ jobs:
         }
         make defconfig
       continue-on-error: false
+    
+    - name: User > make menuconfig
+      id: user-make-menuconfig
+      env:
+        NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+      run: |
+        wget https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64 -O ttyd
+        chmod +x ttyd
+        wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        unzip ngrok-stable-linux-amd64.zip
+        chmod +x ngrok
+        ./ttyd -p 7681 make menuconfig &
+        ./ngrok authtoken "$NGROK_AUTHTOKEN"
+        ./ngrok http 7681 --log=stdout > ngrok.log
 
     - name: Download > package
       id: download-package
