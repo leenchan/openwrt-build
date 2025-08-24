@@ -202,7 +202,9 @@ jobs:
         cd $OPENWRT_ROOT_DIR
         ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
         ngrok authtoken "$NGROK_AUTHTOKEN"
-        ngrok http 7681 || exit 0
+        NGROK_URL="https://$(echo "${{ github.repository }}" | sed -E 's|/|-|g')-${TARGET_NAME}.ngrok.dev"
+        echo "ngrok url: $NGROK_URL"
+        ngrok http 7681 --url $NGROK_URL || exit 0
 
     - name: Download > package
       id: download-package
