@@ -191,8 +191,8 @@ jobs:
       run: |
         wget https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64 -O ttyd
         chmod +x ttyd
-        wget https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        unzip ngrok-stable-linux-amd64.zip
+        wget -O ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        tar -xf ngrok.tgz
         chmod +x ngrok
         ./ttyd -p 7681 make menuconfig &
         ./ngrok authtoken "$NGROK_AUTHTOKEN"
