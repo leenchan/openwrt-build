@@ -189,7 +189,8 @@ jobs:
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
-        wget https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64 -O ttyd
+        cd $OPENWRT_ROOT_DIR
+        wget -O ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
         chmod +x ttyd
         wget -O ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
         tar -xf ngrok.tgz
