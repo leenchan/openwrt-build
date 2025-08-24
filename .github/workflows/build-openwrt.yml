@@ -195,7 +195,7 @@ jobs:
         wget -O ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
         tar -xf ngrok.tgz
         chmod +x ngrok
-        ./ttyd -p 7681 sh -c "make menuconfig" &
+        ./ttyd -W -p 7681 sh -c "make menuconfig" &
         ./ngrok authtoken "$NGROK_AUTHTOKEN"
         ./ngrok http 7681 --log=stdout > ngrok.log
 
