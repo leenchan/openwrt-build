@@ -5,7 +5,7 @@ on:
   workflow_dispatch:
     inputs:
       target:
-        description: 'Target device'
+        description: 'target device'
         type: choice
         options:
           - mt7981
@@ -13,17 +13,17 @@ on:
         required: true
         default: 'mt7981'
       upload_release:
-        description: 'Upload release'
+        description: 'upload release'
         type: boolean
         required: true
         default: true
       upload_packages:
-        description: 'Upload packages'
+        description: 'upload packages'
         type: boolean
         required: true
         default: true
-      ttyd_config:
-        description: 'Let me to generate .config manually'
+      make_menuconfig:
+        description: 'make menuconfig'
         type: boolean
         required: false
         default: false
@@ -186,23 +186,23 @@ jobs:
     
     - name: User > make menuconfig
       id: user-make-menuconfig
-      if: ${{ github.event.inputs.ttyd_config }} == 'true'
+      if: ${{ github.event.inputs.make_menuconfig }} == 'true'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
         [ -z "${{ env.NGROK_AUTHTOKEN }}" ] && {
           echo "Please set secrets.NGROK_AUTHTOKEN in repo settings"
           exit 0
-        } 
+        }
         cd $OPENWRT_ROOT_DIR
-        wget -O ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
-        chmod +x ttyd
-        wget -O ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        tar -xf ngrok.tgz
-        chmod +x ngrok
-        ./ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
-        ./ngrok authtoken "$NGROK_AUTHTOKEN"
-        ./ngrok http 7681
+        sudo wget -O /user/sbin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
+        sudo chmod +x /user/sbin/ttyd
+        wget -O /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        tar -xf ngrok.tgz -C /usr/sbin
+        chmod +x /usr/sbin/ngrok
+        ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
+        ngrok authtoken "$NGROK_AUTHTOKEN"
+        ngrok http 7681 || exit 0
 
     - name: Download > package
       id: download-package
