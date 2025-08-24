@@ -186,9 +186,14 @@ jobs:
     
     - name: User > make menuconfig
       id: user-make-menuconfig
+      if: ${{ github.event.inputs.ttyd_config }} == 'true'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
+        [ -z "${{ env.NGROK_AUTHTOKEN }}" ] && {
+          echo "Please set secrets.NGROK_AUTHTOKEN in repo settings"
+          exit 0
+        } 
         cd $OPENWRT_ROOT_DIR
         wget -O ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
         chmod +x ttyd
