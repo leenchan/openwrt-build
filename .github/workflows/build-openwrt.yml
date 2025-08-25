@@ -202,6 +202,17 @@ jobs:
         cd $OPENWRT_ROOT_DIR
         ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
         ngrok http 7681 --authtoken $NGROK_AUTHTOKEN --log=stdout 2>&1 || exit 0
+        [ -f .config ] && {
+          cp .config /tmp/menuconfig.config && echo "upload_menuconfig=/tmp/menuconfig.config" >> $GITHUB_OUTPUT
+        }
+
+    - name: User > upload .config
+      uses: actions/upload-artifact@main
+      if: steps.user-make-menuconfig.outputs.upload_menuconfig != ''
+      with:
+        name: menuconfig-config
+        path: |
+          ${{ steps.user-make-menuconfig.outputs.upload_menuconfig }}
 
     - name: Download > package
       id: download-package
