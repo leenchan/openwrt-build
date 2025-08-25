@@ -337,6 +337,7 @@ jobs:
         body_path: release.txt
         files: |
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*sysupgrade*.*
+          ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*rootfs*.img.gz
           ${{ env.OPENWRT_ROOT_DIR }}/bin/config
 
     - name: Delete workflow runs
