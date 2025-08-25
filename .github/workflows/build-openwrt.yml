@@ -201,7 +201,7 @@ jobs:
         sudo chmod +x /usr/sbin/ngrok
         cd $OPENWRT_ROOT_DIR
         ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
-        ngrok http 7681 --authtoken $NGROK_AUTHTOKEN --log=stdout | grep -Eo 'url=[^ ]+' || exit 0
+        ngrok http 7681 --authtoken $NGROK_AUTHTOKEN --log=stdout 2>&1 || exit 0
 
     - name: Download > package
       id: download-package
