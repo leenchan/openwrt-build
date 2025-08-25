@@ -30,8 +30,8 @@ on:
       
 env:
   OPENWRT_ROOT_DIR: /mnt/openwrt
-  CCACHE_DIR: /mnt/openwrt/.cache
   TZ: Asia/Shanghai
+  CCACHE_DIR: ''
   TARGET_NAME: ''
   HASH_TOOLS: ''
   HASH_TOOLCHAIN: ''
@@ -176,7 +176,8 @@ jobs:
         sed -Ei /CONFIG_CCACHE/d .config
         echo "" >> .config
         echo "CONFIG_CCACHE=y" >> .config
-        echo "CONFIG_CCACHE_DIR=\"$CCACHE_DIR\"" >> .config
+        echo "CONFIG_CCACHE_DIR=\"$OPENWRT_ROOT_DIR/.ccache\"" >> .config
+        echo "CCACHE_DIR=$OPENWRT_ROOT_DIR/.ccache" >> $GITHUB_ENV
         [ -f "$OPENWRT_ROOT_DIR/.config" ] || {
           echo "Error: .config file not found"
           exit 1
