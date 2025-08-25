@@ -140,7 +140,7 @@ jobs:
       with:
         path: |
           ${{ env.OPENWRT_ROOT_DIR }}/staging_dir
-        key: openwrt-${{ env.TARGET_NAME }}-staging-dir-${{ env.HASH_TOOLS }}-${{ env.HASH_TOOLCHAIN }}
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-staging-dir-${{ env.HASH_TOOLS }}-${{ env.HASH_TOOLCHAIN }}
 
     - name: Cache > restore ccache
       id: cache-restore-ccache
@@ -148,7 +148,7 @@ jobs:
       with:
         path: |
           ${{ env.CCACHE_DIR }}
-        key: openwrt-${{ env.TARGET_NAME }}-ccache
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-ccache
 
     - name: Cache > restore dl
       id: cache-restore-dl
@@ -272,8 +272,8 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd $OPENWRT_ROOT_DIR
-        gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("openwrt-$TARGET_NAME-staging-dir"))'
-        CACHE_STAGING_DIR_ID=$(gh cache list --json 'id' --key openwrt-$TARGET_NAME-staging-dir | jq '.[0].id')
+        gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("${SOURCE_TYPE}-${TARGET_NAME}-staging-dir"))'
+        CACHE_STAGING_DIR_ID=$(gh cache list --json 'id' --key ${SOURCE_TYPE}-${TARGET_NAME}-staging-dir | jq '.[0].id')
         echo "CACHE_STAGING_DIR_ID: $CACHE_STAGING_DIR_ID"
         echo "$CACHE_STAGING_DIR_ID" | grep -Eq '^[0-9]+$' && gh cache delete $CACHE_STAGING_DIR_ID || true
 
@@ -283,7 +283,7 @@ jobs:
       with:
         path: |
           ${{ env.OPENWRT_ROOT_DIR }}/staging_dir
-        key: openwrt-${{ env.TARGET_NAME }}-staging-dir-${{ env.HASH_TOOLS }}-${{ env.HASH_TOOLCHAIN }}
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-staging-dir-${{ env.HASH_TOOLS }}-${{ env.HASH_TOOLCHAIN }}
 
     - name: Cache > remove ccache
       id: cache-remove-ccache
@@ -293,8 +293,8 @@ jobs:
         GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       run: |
         cd $OPENWRT_ROOT_DIR
-        gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("openwrt-${TARGET_NAME}-ccache"))'
-        CACHE_CCACHE_ID=$(gh cache list --json 'id' --key openwrt-${TARGET_NAME}-ccache | jq '.[0].id')
+        gh cache list --json 'id,key,sizeInBytes,createdAt' | jq -r '.[] | select(.key | contains("${SOURCE_TYPE}-${TARGET_NAME}-ccache"))'
+        CACHE_CCACHE_ID=$(gh cache list --json 'id' --key ${SOURCE_TYPE}-${TARGET_NAME}-ccache | jq '.[0].id')
         echo "CACHE_CCACHE_ID: $CACHE_CCACHE_ID"
         echo "$CACHE_CCACHE_ID" | grep -Eq '^[0-9]+$' && gh cache delete $CACHE_CCACHE_ID || true        
 
@@ -304,7 +304,7 @@ jobs:
       with:
         path: |
           ${{ env.CCACHE_DIR }}
-        key: openwrt-${{ env.TARGET_NAME }}-ccache
+        key: ${{ env.SOURCE_TYPE }}-${{ env.TARGET_NAME }}-ccache
 
     - name: Upload packages
       uses: actions/upload-artifact@main
