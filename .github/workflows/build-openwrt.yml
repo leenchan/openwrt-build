@@ -194,9 +194,9 @@ jobs:
           echo "Please set secrets.NGROK_AUTHTOKEN in repo settings"
           exit 0
         }
-        sudo wget -O /usr/sbin/ttyd https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
+        sudo curl -kL -o "/usr/sbin/ttyd" https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
         sudo chmod +x /usr/sbin/ttyd
-        sudo wget -O /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+        sudo curl -kL -o /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
         sudo tar -xf /tmp/ngrok.tgz -C /usr/sbin
         sudo chmod +x /usr/sbin/ngrok
         cd $OPENWRT_ROOT_DIR
