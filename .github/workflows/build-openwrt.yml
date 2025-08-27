@@ -317,7 +317,7 @@ jobs:
         echo "Branch: $REPO_BRANCH" >> release.txt
         echo "Target: $TARGET_NAME" >> release.txt
         [ -f "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" ] && cat "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" >> release.txt
-        ls ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*sysupgrade*.*
+        ls ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/
 
     - name: Upload firmware to release
       id: upload-firmware-to-release
