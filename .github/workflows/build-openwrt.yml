@@ -44,6 +44,8 @@ env:
 
 jobs:
   build:
+    name: Build ${{ github.event.inputs.target }}
+
     runs-on: ubuntu-latest
 
     steps:
