@@ -188,7 +188,7 @@ jobs:
     
     - name: User > make menuconfig
       id: user-make-menuconfig
-      if: env.MAKE_MENUCONFIG == 'true'
+      if: ${{ github.event.inputs.make_menuconfig }} == 'true'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
@@ -328,6 +328,7 @@ jobs:
         echo "Target: $TARGET_NAME" >> release.txt
         [ -f "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" ] && cat "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" >> release.txt
         echo "status=success" >> $GITHUB_OUTPUT
+        ls bin/targets/*/*/
 
     - name: Upload firmware to release
       uses: softprops/action-gh-release@v1
