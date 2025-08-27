@@ -178,7 +178,7 @@ jobs:
         sed -Ei /CONFIG_CCACHE/d .config
         echo "" >> .config
         echo "CONFIG_CCACHE=y" >> .config
-        echo "CONFIG_CCACHE_DIR=\"$CCACHE_DIR\"" >> .config
+        echo "CONFIG_CCACHE_DIR=\"\$(TOPDIR)/.ccache\"" >> .config
         [ -f "$OPENWRT_ROOT_DIR/.config" ] || {
           echo "Error: .config file not found"
           exit 1
