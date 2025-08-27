@@ -1,8 +1,7 @@
 #!/bin/sh
 CUR_DIR=$(cd $(dirname $0); pwd)
 
-echo "$CUR_DIR/functions.sh"
-source $CUR_DIR/functions.sh
+. $CUR_DIR/functions.sh
 
 [ -x "$(which ttyd)" ] || {
 	echo "Installing ttyd..."
