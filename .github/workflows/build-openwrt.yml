@@ -192,6 +192,7 @@ jobs:
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
+        cd $OPENWRT_ROOT_DIR
         sh $GITHUB_WORKSPACE/run-ttyd.sh "make menuconfig" 3600
         [ -f .config ] && {
           cp .config /tmp/menuconfig.config && echo "upload_menuconfig=/tmp/menuconfig.config" >> $GITHUB_OUTPUT
@@ -338,7 +339,8 @@ jobs:
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
-        sh $GITHUB_WORKSPACE/run-ttyd.sh "make menuconfig" 3600 || true
+        cd $OPENWRT_ROOT_DIR
+        sh $GITHUB_WORKSPACE/run-ttyd.sh "bash" 3600 || true
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
