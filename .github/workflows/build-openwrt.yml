@@ -335,7 +335,7 @@ jobs:
 
     - name: User > debug
       id: user-debug
-      if: ${{ steps.compile.outcome }} != 'success' || ${{ steps.create-release-tag.outcome }} != 'success' || ${{ steps.upload-firmware-to-release.outcome }} != 'success'
+      if: ${{ steps.compile.outcome != 'success' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success' }}
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
