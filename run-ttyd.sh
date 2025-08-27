@@ -8,7 +8,12 @@
 
 [ -x "$(which ngrok)" ] || {
   echo "Installing ngrok..."
-  sudo curl -skL -o /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
+  NGROK_DL_URL=$(curl -skL https://ngrok.com/downloads/linux?tab=download | grep -Eo 'href="[^"]+"' | awk -F'"' '{print $2}' | grep 'amd64' | head -n1)
+  [ -z "${NGROK_DL_URL}" ] && {
+    echo "Failed to get ngrok download URL"
+    exit 1
+  }
+  sudo curl -skL -o /tmp/ngrok.tgz "${NGROK_DL_URL}"
   sudo tar -xf /tmp/ngrok.tgz -C /usr/sbin
   sudo chmod +x /usr/sbin/ngrok
 }
