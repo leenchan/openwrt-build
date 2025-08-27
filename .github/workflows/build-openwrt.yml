@@ -192,18 +192,7 @@ jobs:
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
-        [ -z "${{ env.NGROK_AUTHTOKEN }}" ] && {
-          echo "Please set secrets.NGROK_AUTHTOKEN in repo settings"
-          exit 0
-        }
-        sudo curl -kL -o "/usr/sbin/ttyd" https://github.com/tsl0922/ttyd/releases/download/1.7.4/ttyd.x86_64
-        sudo chmod +x /usr/sbin/ttyd
-        sudo curl -kL -o /tmp/ngrok.tgz https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz
-        sudo tar -xf /tmp/ngrok.tgz -C /usr/sbin
-        sudo chmod +x /usr/sbin/ngrok
-        cd $OPENWRT_ROOT_DIR
-        ttyd -W -p 7681 sh -c "make menuconfig; killall ngrok" &
-        ngrok http 7681 --authtoken $NGROK_AUTHTOKEN --log=stdout 2>&1 || exit 0
+        sh $GITHUB_WORKSPACE/run-ttyd.sh "make menuconfig" 3600
         [ -f .config ] && {
           cp .config /tmp/menuconfig.config && echo "upload_menuconfig=/tmp/menuconfig.config" >> $GITHUB_OUTPUT
         }
@@ -318,8 +307,8 @@ jobs:
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/packages/*
 
     - name: Generate release tag
-      id: tag
-      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      id: create-release-tag
+      if: steps.compile.outcome == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         echo "release_tag=${RELEASE_PREFIX}-${REPO_COMMIT_HASH}-${TARGET_NAME}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
@@ -327,12 +316,12 @@ jobs:
         echo "Branch: $REPO_BRANCH" >> release.txt
         echo "Target: $TARGET_NAME" >> release.txt
         [ -f "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" ] && cat "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" >> release.txt
-        echo "status=success" >> $GITHUB_OUTPUT
-        ls bin/targets/*/*/
+        ls ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*sysupgrade*.*
 
     - name: Upload firmware to release
+      id: upload-firmware-to-release
       uses: softprops/action-gh-release@v1
-      if: steps.tag.outputs.status == 'success' && steps.tag.outputs.status == 'success' && !cancelled()
+      if: steps.create-release-tag.outcome == 'success' && !cancelled()
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
@@ -342,6 +331,14 @@ jobs:
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*sysupgrade*.*
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*rootfs*.img.gz
           ${{ env.OPENWRT_ROOT_DIR }}/bin/config
+
+    - name: User > debug
+      id: user-debug
+      if: ${{ steps.compile.outcome }} != 'success' || ${{ steps.create-release-tag.outcome }} != 'success' || ${{ steps.upload-firmware-to-release.outcome }} != 'success'
+      env:
+        NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
+      run: |
+        sh $GITHUB_WORKSPACE/run-ttyd.sh "make menuconfig" 3600 || true
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
