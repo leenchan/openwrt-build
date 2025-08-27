@@ -181,7 +181,7 @@ jobs:
         echo "" >> .config
         echo "CONFIG_CCACHE=y" >> .config
         echo "CONFIG_CCACHE_DIR=\"\$(TOPDIR)/.ccache\"" >> .config
-        [ -f "$OPENWRT_ROOT_DIR/.config" ] || {
+        [ -f .config ] || {
           echo "Error: .config file not found"
           exit 1
         }
