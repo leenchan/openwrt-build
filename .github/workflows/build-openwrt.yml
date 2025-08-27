@@ -257,6 +257,7 @@ jobs:
           echo "status=success" >> $GITHUB_OUTPUT
           echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         }
+      continue-on-error: true
 
     - name: Cache > remove toolchain
       id: cache-remove-toolchain
@@ -320,6 +321,7 @@ jobs:
         echo "Target: $TARGET_NAME" >> release.txt
         [ -f "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" ] && cat "$GITHUB_WORKSPACE/$TARGET_NAME/release.txt" >> release.txt
         ls ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/
+      continue-on-error: true
 
     - name: Upload firmware to release
       id: upload-firmware-to-release
@@ -328,12 +330,13 @@ jobs:
       env:
         GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       with:
-        tag_name: ${{ steps.tag.outputs.release_tag }}
+        tag_name: ${{ steps.create-release-tag.outputs.release_tag }}
         body_path: release.txt
         files: |
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*sysupgrade*.*
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*rootfs*.*
           ${{ env.OPENWRT_ROOT_DIR }}/bin/config
+      continue-on-error: true
 
     - name: User > debug
       id: user-debug

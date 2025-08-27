@@ -6,20 +6,13 @@ source $CUR_DIR/functions.sh
 [ -x "$(which ttyd)" ] || {
   echo "Installing ttyd..."
   TTYD_DL_URL=$(get_github_release "tsl0922/ttyd" "1.7.4" "x86_64")
-  sudo curl -skL -o "/usr/sbin/ttyd" "${TTYD_DL_URL}"
-  sudo chmod +x /usr/sbin/ttyd
+  install_bin "${TTYD_DL_URL}" "$(basename "$TTYD_DL_URL"):ttyd"
 }
 
 [ -x "$(which ngrok)" ] || {
   echo "Installing ngrok..."
   NGROK_DL_URL=$(get_urls_from_html "https://ngrok.com/downloads/linux?tab=download" | grep 'amd64' | head -n1)
-  [ -z "${NGROK_DL_URL}" ] && {
-    echo "Failed to get ngrok download URL"
-    exit 1
-  }
-  sudo curl -skL -o /tmp/ngrok.tgz "${NGROK_DL_URL}"
-  sudo tar -xf /tmp/ngrok.tgz -C /usr/sbin
-  sudo chmod +x /usr/sbin/ngrok
+  install_bin "$NGROK_DL_URL" "ngrok"
 }
 
 [ -x "$(which ttyd)" -a -x "$(which ngrok)" ] || exit 1
