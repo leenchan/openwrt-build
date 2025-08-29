@@ -177,10 +177,10 @@ jobs:
         [ -d "staging_dir" ] && find staging_dir -type f -regex '.*/.built' -exec touch {} \;
         [ -d "build_dir" ] && find build_dir -type f -regex '.*/stamp/.*' -exec touch {} \;
         [ -d "build_dir" ] && find build_dir -type f -regex '.*/.built' -exec touch {} \;
-        sed -Ei /CONFIG_CCACHE|CONFIG_DEVEL/d .config
+        sed -Ei '/(CONFIG_CCACHE|CONFIG_DEVEL)/d' .config
         echo "" >> .config
         echo "CONFIG_DEVEL=y" >> .config
-        echo "CONFIG_CCACHE=y" >> .config
+        echo "CONFIG_CCACHE=y" >> .config        
         echo "CONFIG_CCACHE_DIR=\"\$(TOPDIR)/.ccache\"" >> .config
         [ -f .config ] || {
           echo "Error: .config file not found"
