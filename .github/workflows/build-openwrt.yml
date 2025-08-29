@@ -253,10 +253,15 @@ jobs:
       id: compile
       run: |
         cd $OPENWRT_ROOT_DIR
-        make -j$(nproc) 2>&1 | tee compile.txt || make -j1 V=s 2>&1 | tee compile.txt
-        cp .config ./bin/config
-        echo "status=success" >> $GITHUB_OUTPUT
-        echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        STATUS=success
+        make -j$(nproc) || make -j1 V=s || STATUS=failed
+        [ "$STATUS" = "success" ] && {
+          cp .config ./bin/config
+          echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
+        }
+        echo "STATUS: $STATUS"
+        echo "status=$STATUS" >> $GITHUB_OUTPUT
+      continue-on-error: true
 
     - name: Cache > remove toolchain
       id: cache-remove-toolchain
@@ -311,7 +316,7 @@ jobs:
 
     - name: Generate release tag
       id: create-release-tag
-      if: steps.compile.outcome == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
+      if: steps.compile.outputs.status == 'success' && env.UPLOAD_RELEASE == 'true' && !cancelled()
       run: |
         echo "release_tag=${RELEASE_PREFIX}-${REPO_COMMIT_HASH}-${TARGET_NAME}-$(date +"%Y.%m.%d-%H%M")" >> $GITHUB_OUTPUT
         touch release.txt
@@ -340,17 +345,15 @@ jobs:
 
     - name: User > debug
       id: user-debug
-      if: ${{ steps.compile.outcome != 'success' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success' }}
+      if: steps.compile.outputs.status == 'failed' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
         cd $OPENWRT_ROOT_DIR
         sh $GITHUB_WORKSPACE/run-ttyd.sh "bash" 3600 || true
-      continue-on-error: true
 
     - name: Delete workflow runs
       uses: GitRML/delete-workflow-runs@main
       with:
         retain_days: 1
         keep_minimum_runs: 3
-      continue-on-error: true
