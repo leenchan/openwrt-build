@@ -254,7 +254,8 @@ jobs:
       run: |
         cd $OPENWRT_ROOT_DIR
         STATUS=success
-        make -j$(nproc) || make -j1 V=s || STATUS=failed
+        set -o pipefail
+        make -j$(nproc) 2>&1 | tee compile-log.txt || make -j1 V=s 2>&1 | tee compile-log.txt || STATUS=fail
         [ "$STATUS" = "success" ] && {
           cp .config ./bin/config
           echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
@@ -262,6 +263,14 @@ jobs:
         echo "STATUS: $STATUS"
         echo "status=$STATUS" >> $GITHUB_OUTPUT
       continue-on-error: true
+
+    - name: Upload compile log
+      uses: actions/upload-artifact@main
+      if: steps.compile.outputs.status == 'fail'
+      with:
+        name: compile-log-${{ env.TARGET_NAME }}-${{ env.BUILD_DATE }}
+        path: |
+          ${{ env.OPENWRT_ROOT_DIR }}/compile-log.txt
 
     - name: Cache > remove toolchain
       id: cache-remove-toolchain
@@ -345,7 +354,7 @@ jobs:
 
     - name: User > debug
       id: user-debug
-      if: steps.compile.outputs.status == 'failed' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success'
+      if: steps.compile.outputs.status == 'fail' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
