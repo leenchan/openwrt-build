@@ -186,7 +186,7 @@ jobs:
           echo "Error: .config file not found"
           exit 1
         }
-        make defconfig
+        FORCE=1 make defconfig
       continue-on-error: false
     
     - name: User > make menuconfig
