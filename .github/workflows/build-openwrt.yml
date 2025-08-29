@@ -253,16 +253,10 @@ jobs:
       id: compile
       run: |
         cd $OPENWRT_ROOT_DIR
-        BUILD_SUCCESS=false
-        make -j$(nproc) 2>&1 | tee compile.txt && BUILD_SUCCESS=true
-        [ "$BUILD_SUCCESS" = "false" ] && make -j1 V=s 2>&1 | tee compile.txt && BUILD_SUCCESS=true
-        [ "$BUILD_SUCCESS" = "true" ] && {
-          cp .config ./bin/config
-          echo "status=success" >> $GITHUB_OUTPUT
-          echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-          exit 0
-        }
-        exit 1
+        make -j$(nproc) 2>&1 | tee compile.txt || make -j1 V=s 2>&1 | tee compile.txt
+        cp .config ./bin/config
+        echo "status=success" >> $GITHUB_OUTPUT
+        echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
 
     - name: Cache > remove toolchain
       id: cache-remove-toolchain
