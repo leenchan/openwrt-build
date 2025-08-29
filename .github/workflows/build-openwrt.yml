@@ -75,9 +75,9 @@ jobs:
         echo "REPO_BRANCH=$REPO_BRANCH" >> $GITHUB_ENV
         echo "TARGET_NAME=$TARGET_NAME" >> $GITHUB_ENV
         echo "RELEASE_PREFIX=$RELEASE_PREFIX" >> $GITHUB_ENV
-        echo "UPLOAD_RELEASE=$([ ${{ github.event.inputs.upload_release }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
-        echo "UPLOAD_PACKAGES=$([ ${{ github.event.inputs.upload_packages }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
-        echo "MAKE_MENUCONFIG=$([ ${{ github.event.inputs.make_menuconfig }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
+        echo "UPLOAD_RELEASE=$([ "${{ github.event.inputs.upload_release }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "UPLOAD_PACKAGES=$([ "${{ github.event.inputs.upload_packages }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "MAKE_MENUCONFIG=$([ "${{ github.event.inputs.make_menuconfig }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
       continue-on-error: false
 
     - name: Checkout
@@ -191,7 +191,7 @@ jobs:
     
     - name: User > make menuconfig
       id: user-make-menuconfig
-      if: ${{ github.event.inputs.make_menuconfig }} == 'true'
+      if: ${{ env.MAKE_MENUCONFIG == 'true' }}
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
