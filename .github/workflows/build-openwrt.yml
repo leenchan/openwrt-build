@@ -134,6 +134,7 @@ jobs:
       id: hash
       run: |
         cd $OPENWRT_ROOT_DIR
+        echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         echo HASH_TOOLS=$(tar --sort=name --mtime='2000-01-01 00:00:00 UTC' -C ./tools -cf - . | sha256sum | awk '{print $1}') >> $GITHUB_ENV
         echo HASH_TOOLCHAIN=$(tar --sort=name --mtime='2000-01-01 00:00:00 UTC' -C ./toolchain -cf - . | sha256sum | awk '{print $1}') >> $GITHUB_ENV
         echo HASH_TARGET=$(tar --sort=name --mtime='2000-01-01 00:00:00 UTC' -C ./target -cf - . | sha256sum | awk '{print $1}') >> $GITHUB_ENV
@@ -205,7 +206,7 @@ jobs:
       uses: actions/upload-artifact@main
       if: steps.user-make-menuconfig.outputs.upload_menuconfig != ''
       with:
-        name: menuconfig-config
+        name: menuconfig-config-${{ env.BUILD_DATE }}
         path: |
           ${{ steps.user-make-menuconfig.outputs.upload_menuconfig }}
 
@@ -252,7 +253,6 @@ jobs:
     - name: Compile the firmware
       id: compile
       run: |
-        echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         STATUS=success
         cd $OPENWRT_ROOT_DIR
         set -o pipefail
