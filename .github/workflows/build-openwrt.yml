@@ -252,14 +252,12 @@ jobs:
     - name: Compile the firmware
       id: compile
       run: |
-        cd $OPENWRT_ROOT_DIR
+        echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
         STATUS=success
+        cd $OPENWRT_ROOT_DIR
         set -o pipefail
         make -j$(nproc) 2>&1 | tee compile-log.txt || make -j1 V=s 2>&1 | tee compile-log.txt || STATUS=fail
-        [ "$STATUS" = "success" ] && {
-          cp .config ./bin/config
-          echo "BUILD_DATE=$(date +"%Y%m%d%H%M")" >> $GITHUB_ENV
-        }
+        [ "$STATUS" = "success" ] && cp .config ./bin/config
         echo "STATUS: $STATUS"
         echo "status=$STATUS" >> $GITHUB_OUTPUT
       continue-on-error: true
@@ -366,3 +364,7 @@ jobs:
       with:
         retain_days: 1
         keep_minimum_runs: 3
+
+    - name: Complete
+      run: |
+        [ "${{ steps.compile.outputs.status }}" = "success" ] || false
