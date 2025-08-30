@@ -349,6 +349,7 @@ jobs:
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*combined*.img.gz
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*x86*.tar.gz
           ${{ env.OPENWRT_ROOT_DIR }}/bin/targets/*/*/*x86*.kernel.bin
+          ${{ env.OPENWRT_ROOT_DIR }}/bin/config
 
     - name: User > debug
       id: user-debug
