@@ -27,6 +27,11 @@ on:
         type: boolean
         required: false
         default: false
+      user_debug:
+        description: 'user debug'
+        type: boolean
+        required: false
+        default: false
       
 env:
   OPENWRT_ROOT_DIR: /mnt/openwrt
@@ -41,6 +46,7 @@ env:
   UPLOAD_PACKAGES: true
   UPLOAD_RELEASE: true
   MAKE_MENUCONFIG: false
+  USER_DEBUG: false
 
 jobs:
   build:
@@ -78,6 +84,7 @@ jobs:
         echo "UPLOAD_RELEASE=$([ "${{ github.event.inputs.upload_release }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
         echo "UPLOAD_PACKAGES=$([ "${{ github.event.inputs.upload_packages }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
         echo "MAKE_MENUCONFIG=$([ "${{ github.event.inputs.make_menuconfig }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
+        echo "USER_DEBUG=$([ "${{ github.event.inputs.user_debug }}" = "true" ] && echo "true" || echo "false")" >> $GITHUB_ENV
       continue-on-error: false
 
     - name: Checkout
@@ -353,7 +360,7 @@ jobs:
 
     - name: User > debug
       id: user-debug
-      if: steps.compile.outputs.status == 'fail' || steps.create-release-tag.outcome != 'success' || steps.upload-firmware-to-release.outcome != 'success'
+      if: env.USER_DEBUG == 'true'
       env:
         NGROK_AUTHTOKEN: ${{ secrets.NGROK_AUTHTOKEN }}
       run: |
