@@ -70,8 +70,6 @@ jobs:
           TARGET_NAME="x86_64"
           RELEASE_PREFIX="${SOURCE_TYPE}-snapshot"
         fi
-        echo "UPLOAD_RELEASE=$([ ${{ github.event.inputs.upload_release }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
-        echo "UPLOAD_PACKAGES=$([ ${{ github.event.inputs.upload_packages }} = 'true' ] && echo 'true' || echo 'false')" >> $GITHUB_ENV
         [ -z "$TARGET_NAME" ] && {
           echo "Error: TARGET_NAME is not set"
           exit 1
