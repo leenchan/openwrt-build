@@ -6,5 +6,5 @@
 
 # Fix compile nginx-mod-njs
 grep -Eq 'NGX_LD_OPT' feeds/packages/net/nginx/patches/nginx-mod-njs/104-endianness_fix.patch || {
-  cp -f $GITHUB_WORKSPACE/nginx/patches/nginx-mod-njs/104-endianness_fix.patch feeds/packages/net/nginx/patches/nginx-mod-njs/104-endianness_fix.patch
+  cp -f $GITHUB_WORKSPACE/feeds/nginx/patches/nginx-mod-njs/104-endianness_fix.patch feeds/packages/net/nginx/patches/nginx-mod-njs/104-endianness_fix.patch
 }
