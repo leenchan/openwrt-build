@@ -11,7 +11,8 @@ CUR_DIR=$(cd $(dirname $0); pwd)
 
 [ -x "$(which ngrok)" ] || {
 	echo "Installing ngrok..."
-	NGROK_DL_URL=$(get_urls_from_html "https://ngrok.com/downloads/linux?tab=download" | grep 'amd64' | head -n1)
+	# NGROK_DL_URL=$(get_urls_from_html "https://ngrok.com/downloads/linux?tab=download" | grep 'amd64' | head -n1)
+	NGROK_DL_URL="https://bin.equinox.io/c/bNyj1mQVY4c/ngrok-v3-stable-linux-amd64.tgz"
 	install_bin "$NGROK_DL_URL" "ngrok"
 }
 
