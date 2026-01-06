@@ -47,6 +47,7 @@ env:
   UPLOAD_RELEASE: true
   MAKE_MENUCONFIG: false
   USER_DEBUG: false
+  
 
 jobs:
   build:
@@ -113,7 +114,7 @@ jobs:
 
     - name: Load custom feeds
       env:
-        GITHUB_PAT_TOKEN: ${{ secrets.GITHUB_PAT_TOKEN }}
+        GH_TOKEN: ${{ secrets.GH_TOKEN }}
       run: |
         cd $OPENWRT_ROOT_DIR
         [ -f $GITHUB_WORKSPACE/$TARGET_NAME/feeds.conf.default ] && mv $GITHUB_WORKSPACE/$TARGET_NAME/feeds.conf.default ${{ env.OPENWRT_ROOT_DIR }}/feeds.conf.default
