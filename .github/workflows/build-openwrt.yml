@@ -112,6 +112,8 @@ jobs:
         echo "REPO_COMMIT_HASH=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
     - name: Load custom feeds
+      env:
+        GITHUB_PAT_TOKEN: ${{ secrets.GITHUB_PAT_TOKEN }}
       run: |
         cd $OPENWRT_ROOT_DIR
         [ -f $GITHUB_WORKSPACE/$TARGET_NAME/feeds.conf.default ] && mv $GITHUB_WORKSPACE/$TARGET_NAME/feeds.conf.default ${{ env.OPENWRT_ROOT_DIR }}/feeds.conf.default
