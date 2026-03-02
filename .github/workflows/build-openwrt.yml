@@ -138,6 +138,10 @@ jobs:
           [ -d "$GO_ROOT_DIR/bin" ] && echo "GO_ROOT_DIR=$GO_ROOT_DIR" >> $GITHUB_ENV
         }
 
+    - name: Fix rust
+      run: |
+        cd $OPENWRT_ROOT_DIR && wget -O feeds/packages/lang/rust/Makefile https://raw.githubusercontent.com/immortalwrt/packages/refs/heads/master/lang/rust/Makefile
+
     - name: Generate hash
       id: hash
       run: |
