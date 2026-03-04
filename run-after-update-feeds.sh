@@ -15,7 +15,11 @@ install_go() {
 }
 
 fix_rust() {
-	echo "Fix rust ..."
+	grep -Eq 'llvm.download-ci-llvm' $OPENWRT_ROOT_DIR/feeds/packages/lang/rust/Makefile && {
+		echo "disable download llvm for rust ..."
+		sed -Ei '/llvm.download-ci-llvm/d' $OPENWRT_ROOT_DIR/feeds/packages/lang/rust/Makefile
+	}
 }
 
 install_go
+fix_rust
