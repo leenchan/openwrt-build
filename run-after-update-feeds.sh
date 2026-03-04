@@ -1,13 +1,16 @@
 #!/bin/sh
 
 echo "GITHUB_ENV: $GITHUB_ENV"
+echo "OPENWRT_ROOT_DIR: $OPENWRT_ROOT_DIR"
 
 install_go() {
 	GO_PATH=$(curl -skL 'https://go.dev/dl/' | grep -Eo 'href="/dl/[^"]+"' | sed -E 's/.*"(.*)"/\1/g' | grep 'amd64.*\.tar\.gz'| head -n1)
 	[ -z "$GO_PATH" ] || {
-		GO_ROOT_DIR="$1/go"
-		curl -kL "https://go.dev$GO_PATH" > go.tar.gz && tar -xf go.tar.gz -C $1
+		echo "Installing Go ..."
+		GO_ROOT_DIR="$OPENWRT_ROOT_DIR/go"
+		curl -kL "https://go.dev$GO_PATH" > /tmp/go.tar.gz && tar -xf /tmp/go.tar.gz -C $OPENWRT_ROOT_DIR && rm -f /tmp/go.tar.gz
 		[ -d "$GO_ROOT_DIR/bin" ] && echo "GO_ROOT_DIR=$GO_ROOT_DIR" >> $GITHUB_ENV
+		echo "GO_ROOT_DIR=$GO_ROOT_DIR"
 	}
 }
 
