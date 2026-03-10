@@ -169,6 +169,10 @@ jobs:
     - name: Prepare for compiling
       run: |
         [ -f $GITHUB_WORKSPACE/$TARGET_NAME/.config ] && cp -rf $GITHUB_WORKSPACE/$TARGET_NAME/.config $OPENWRT_ROOT_DIR/.config
+        [ -f .config ] || {
+          echo "Error: .config file not found"
+          exit 1
+        }
         [ -d $GITHUB_WORKSPACE/files ] && cp -rf $GITHUB_WORKSPACE/files $OPENWRT_ROOT_DIR/files
         [ -d $GITHUB_WORKSPACE/$TARGET_NAME/files ] && cp -rf $GITHUB_WORKSPACE/$TARGET_NAME/files $OPENWRT_ROOT_DIR/files
         cd $OPENWRT_ROOT_DIR
@@ -176,7 +180,6 @@ jobs:
           chmod +x $GITHUB_WORKSPACE/run-before-build.sh
           $GITHUB_WORKSPACE/run-before-build.sh
         }
-        [ -n "$GO_ROOT_DIR" ] && sed -Ei "s|(CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=).*|\1\"$GO_ROOT_DIR\"|g" .config
         [ -d "staging_dir" ] && find staging_dir -type f -regex '.*/stamp/.*' -exec touch {} \;
         [ -d "staging_dir" ] && find staging_dir -type f -regex '.*/.built' -exec touch {} \;
         [ -d "build_dir" ] && find build_dir -type f -regex '.*/stamp/.*' -exec touch {} \;
@@ -186,9 +189,12 @@ jobs:
         echo "CONFIG_DEVEL=y" >> .config
         echo "CONFIG_CCACHE=y" >> .config        
         echo "CONFIG_CCACHE_DIR=\"\$(TOPDIR)/.ccache\"" >> .config
-        [ -f .config ] || {
-          echo "Error: .config file not found"
-          exit 1
+        [ -z "$GO_ROOT_DIR" ] || {
+          if grep -Eq '^CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT' .config; then
+            sed -Ei "s|(CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=).*|\1\"$GO_ROOT_DIR\"|g" .config
+          else
+            echo "CONFIG_GOLANG_EXTERNAL_BOOTSTRAP_ROOT=\"$GO_ROOT_DIR\"" >> .config
+          fi
         }
         make defconfig
       continue-on-error: false
