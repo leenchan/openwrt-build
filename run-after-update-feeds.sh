@@ -28,8 +28,8 @@ install_go() {
 		echo "Go Version: $($GO_ROOT_DIR/bin/go version)"
 	}
 	PACKAGES_GO_VERSION_CURRENT=$(cat $OPENWRT_ROOT_DIR/feeds/packages/lang/golang/*/Makefile | grep 'GO_VERSION_MAJOR_MINOR:=' | awk -F'=' '{print $2}' | head -n1)
-	[ -z "$CURRENT_GO_VERSION" ] || {
-		[ "$CURRENT_GO_VERSION" -lt "1.24" ] && rm -rf $OPENWRT_ROOT_DIR/feeds/packages/lang/golang && cp -rf $GITHUB_WORKSPACE/feeds/golang $OPENWRT_ROOT_DIR/feeds/packages/lang/golang
+	[ -z "$PACKAGES_GO_VERSION_CURRENT" ] || {
+		[ "$PACKAGES_GO_VERSION_CURRENT" -lt "1.24" ] && rm -rf $OPENWRT_ROOT_DIR/feeds/packages/lang/golang && cp -rf $GITHUB_WORKSPACE/feeds/golang $OPENWRT_ROOT_DIR/feeds/packages/lang/golang
 	}
 	PACKAGES_GO_VERSION=$(cat $OPENWRT_ROOT_DIR/feeds/packages/lang/golang/*/Makefile | grep 'GO_VERSION_MAJOR_MINOR:=' | awk -F'=' '{print $2}' | head -n1)
 	echo "PACKAGES_GO_VERSION: $PACKAGES_GO_VERSION"
