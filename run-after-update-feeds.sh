@@ -1,7 +1,22 @@
 #!/bin/sh
+CUR_DIR=$(cd $(dirname $0); pwd)
 
 echo "GITHUB_ENV: $GITHUB_ENV"
 echo "OPENWRT_ROOT_DIR: $OPENWRT_ROOT_DIR"
+
+export OPENWRT_PACKAGES_DIR=
+
+download_openwrt_package() {
+	[ -z "$OPENWRT_PACKAGES_DIR" ] && {
+		cd /tmp && git clone https://github.com/openwrt/packages.git openwrt-packages && export OPENWRT_PACKAGES_DIR=/tmp/openwrt-packages
+	}
+	[ -d "$OPENWRT_PACKAGES_DIR" ] && cd $OPENWRT_PACKAGES_DIR && {
+		git checkout ${1:-master} || export OPENWRT_PACKAGES_DIR=
+	}
+	cd $CUR_DIR
+	[ -z "$OPENWRT_PACKAGES_DIR" ] && return 1
+	return 0
+}
 
 install_go() {
 	GO_PATH=$(curl -skL 'https://go.dev/dl/' | grep -Eo 'href="/dl/[^"]+"' | sed -E 's/.*"(.*)"/\1/g' | grep 'amd64.*\.tar\.gz'| head -n1)
@@ -11,6 +26,9 @@ install_go() {
 		curl -kL "https://go.dev$GO_PATH" > /tmp/go.tar.gz && tar -xf /tmp/go.tar.gz -C $OPENWRT_ROOT_DIR && rm -f /tmp/go.tar.gz
 		[ -d "$GO_ROOT_DIR/bin" ] && echo "GO_ROOT_DIR=$GO_ROOT_DIR" >> $GITHUB_ENV
 		echo "Go Version: $($GO_ROOT_DIR/bin/go version)"
+	}
+	download_openwrt_package && {
+		rm -rf $OPENWRT_ROOT_DIR/feeds/packages/lang/golang && cp -rf $OPENWRT_PACKAGES_DIR/lang/golang $OPENWRT_ROOT_DIR/feeds/packages/lang/golang
 	}
 }
 
