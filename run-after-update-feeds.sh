@@ -10,7 +10,7 @@ install_go() {
 		GO_ROOT_DIR="$OPENWRT_ROOT_DIR/go"
 		curl -kL "https://go.dev$GO_PATH" > /tmp/go.tar.gz && tar -xf /tmp/go.tar.gz -C $OPENWRT_ROOT_DIR && rm -f /tmp/go.tar.gz
 		[ -d "$GO_ROOT_DIR/bin" ] && echo "GO_ROOT_DIR=$GO_ROOT_DIR" >> $GITHUB_ENV
-		echo "GO_ROOT_DIR=$GO_ROOT_DIR"
+		echo "Go Version: $($GO_ROOT_DIR/bin/go version)"
 	}
 }
 
