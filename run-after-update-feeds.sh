@@ -27,9 +27,12 @@ install_go() {
 		[ -d "$GO_ROOT_DIR/bin" ] && echo "GO_ROOT_DIR=$GO_ROOT_DIR" >> $GITHUB_ENV
 		echo "Go Version: $($GO_ROOT_DIR/bin/go version)"
 	}
-	download_openwrt_package && {
-		rm -rf $OPENWRT_ROOT_DIR/feeds/packages/lang/golang && cp -rf $OPENWRT_PACKAGES_DIR/lang/golang $OPENWRT_ROOT_DIR/feeds/packages/lang/golang
+	PACKAGES_GO_VERSION_CURRENT=$(cat $OPENWRT_ROOT_DIR/feeds/packages/lang/golang/*/Makefile | grep 'GO_VERSION_MAJOR_MINOR:=' | awk -F'=' '{print $2}' | head -n1)
+	[ -z "$CURRENT_GO_VERSION" ] || {
+		[ "$CURRENT_GO_VERSION" -lt "1.24" ] && rm -rf $OPENWRT_ROOT_DIR/feeds/packages/lang/golang && cp -rf $GITHUB_WORKSPACE/feeds/golang $OPENWRT_ROOT_DIR/feeds/packages/lang/golang
 	}
+	PACKAGES_GO_VERSION=$(cat $OPENWRT_ROOT_DIR/feeds/packages/lang/golang/*/Makefile | grep 'GO_VERSION_MAJOR_MINOR:=' | awk -F'=' '{print $2}' | head -n1)
+	echo "PACKAGES_GO_VERSION: $PACKAGES_GO_VERSION"
 }
 
 fix_rust() {
