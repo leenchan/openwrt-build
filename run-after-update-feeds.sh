@@ -44,6 +44,7 @@ fix_rust() {
 
 fix_passwall_conflict() {
 	[ -d "$OPENWRT_ROOT_DIR/package/custom/luci-app-passwall" ] && rm -rf $OPENWRT_ROOT_DIR/feeds/luci/applications/luci-app-passwall
+	[ -d "$OPENWRT_ROOT_DIR/package/custom/luci-app-passwall2" ] && rm -rf $OPENWRT_ROOT_DIR/feeds/luci/applications/luci-app-passwall2
 	[ -d "$OPENWRT_ROOT_DIR/package/custom/passwall" ] && {
 		while read DIR; do
 			[ -z "$DIR" ] && continue
